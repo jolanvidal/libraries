@@ -19,17 +19,18 @@ b.default = {
 function b:new(data) 
 
     local button = {
-        name = data.name or b.default.name,
-        text = data.text or b.default.text,
-        x = data.x or b.default.x,
-        y = data.y or b.default.y,
-        w = data.w or b.default.w,
-        h = data.h or b.default.h,
-        bgColor = data.bgColor or b.default.bgColor,
-        fgColor = data.fgColor or b.default.fgColor,
-        hbgColor = data.hbgColor or b.default.hbgColor,
-        hfgColor = data.hfgColor or b.default.hfgColor,
-        action = data.action or b.default.action,
+        name = data.name or "Name",
+        text = data.text or "Button",
+        x = data.x or 0,
+        y = data.y or 0,
+        w = data.w or 0,
+        h = data.h or 0,
+        bgColor = data.bgColor or {1,1,1},
+        fgColor = data.fgColor or {0,0,0},
+        hbgColor = data.hbgColor or {0,0,0},
+        hfgColor = data.hfgColor or {1,1,1},
+        borderColor = data.borderColor or {1,0,0},
+        action = data.action or function() end,
         font = data.font or love.graphics.getFont(),
         isHover = false
 
@@ -39,10 +40,21 @@ function b:new(data)
 end
 
 function b:draw()
-    print(self.text)
-    love.graphics.setColor(self.bgColor)
-    error(self.x..self.x..self.w..self.h, 2)
+
+    local middleX, middleY = (self.x+self.w)/2, (self.y+self.h)/2
+    
+    -- Rectangle
+    love.graphics.setColor(self.bgColor)    
     love.graphics.rectangle("fill", self.x, self.y, self.w, self.h)
+
+    --Border
+    love.graphics.setColor(self.borderColor)
+    love.graphics.rectangle("line", self.x, self.y, self.w, self.h)
+
+    --Text
+    love.graphics.setColor(self.fgColor)
+    love.graphics.print(self.text, middleX - self.font:getWidth(self.text) / 2, middleY - self.font:getHeight(self.text)/2)
+
     love.graphics.setColor(1,1,1)
 end
 

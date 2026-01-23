@@ -56,9 +56,7 @@ function g:addText(pageName, data)
         error("GUI Error: Page " .. pageName .. " doesn\'t exists", 2)
     end
 end
-
-
--- About Image
+-- Add Image
 function g:addImage(pageName, data) 
     if not pageName or not data then
         return error("GUI Error: Page name or data not passed as arguments for new image.", 2)
@@ -67,11 +65,11 @@ function g:addImage(pageName, data)
     end        
 end
 
--- About Button
+-- Add Button
 function g:addButton(pageName, data)
     if not pageName or not data then
         return error("GUI Error: Page name or data not passed as arguments for new button.", 2)
-    elseif self:pageExists() then
+    elseif self:pageExists(pageName) then
         self.pages[pageName]:add("button", data)
     end
 end

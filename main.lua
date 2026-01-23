@@ -38,16 +38,17 @@ function love.load()
     })   
     
     gui:addButton("main", {
-        x = 400,
-        y = 400,
+        x = 0,
+        y = 0,
         w = 100,
         h = 50,
         name = "mainButton",
         text = "btn",
         font = fonts.buttons,
         action = function() error("CLICK", 2) end,
-        bgColor = nil,
-        fgColor = nil,
+        borderColor = {0,0,1},
+        bgColor = {1,1,1},
+        fgColor = {0,0,0},
         hfgColor = nil,
         hbgColor = nil
     })

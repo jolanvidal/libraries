@@ -78,8 +78,7 @@ function p:modify(elementName, data)
 end
 
 
-function p:draw() 
-    
+function p:draw()     
     for _, obj in pairs(self.activeElements) do       
         self.elements[obj]:draw(self)
     end 
