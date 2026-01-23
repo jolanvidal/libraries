@@ -4,39 +4,70 @@ local gui = require('gui')
 
 
 local fonts = {    
-    headers = love.graphics.newFont(40)
+    headers = love.graphics.newFont(40),
+    buttons = love.graphics.newFont(25)
 }
 
 
-function love.load()
-    gui:newPage({name = 'background'})
-    --[[
-    gui:addRect('background', {
-        type='rect',
-        mode = 'fill',
-        color = {1,0,0},
-        x = 0,
-        y = 0,
-        w = 100,
-        h = 100
-    })
-    ]]
 
-    gui:addText('background', {
-        font = fonts.headers,
-        x = 100, y = 100, content = "Hello world!",
-        name = 'HW'
+function love.load()  
+    i = 0
+    gui:newPage({name = 'main'})
+
+
+    gui:addImage("main", {
+        img = love.graphics.newImage("gui/img/noix.png"),
+        x = 100,
+        y = 100,
+        -- rotation = 0,
+        --targetW = 800,     
+        --targetH = 600,
+        name = "background"
     })
+
+    gui:addText("main", {
+        font = fonts.headers,
+        x = 60,
+        y = 20,
+        content = "Hello world",
+        name = "mainText",
+        --isCentered = false,
+        isCenterX = true,
+        --isCenterY = false
+        color = {1,0,0}
+    })   
+    
+    gui:addButton("main", {
+        x = 400,
+        y = 400,
+        w = 100,
+        h = 50,
+        name = "mainButton",
+        text = "btn",
+        font = fonts.buttons,
+        action = function() error("CLICK", 2) end,
+        bgColor = nil,
+        fgColor = nil,
+        hfgColor = nil,
+        hbgColor = nil
+    })
+
+    
+    
+
+    --gui:modify("main", "background", {x = 0, y = 0, targetX = 800, targetY = 600})
+
 
 end
 
-function love.update(dt)
+function love.update(dt)   
+
 end
 
 function love.draw()
-    --gui:show()
+    gui:show()
 
-     gui.pages["background"]:draw()
+ 
 end
 
 

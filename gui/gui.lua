@@ -1,5 +1,6 @@
 local Page = require("gui.objects.page")
-local Text = require('gui.objects.text')
+
+
 
 
 local g = {
@@ -27,9 +28,10 @@ function g:newPage(data, replace)
     end
 end
 
-function g:removePage(pageName)
+-- Delete page
+function g:delete(pageName)
 
-    if self.pageExists(pageName) then
+    if g.pageExists(pageName) then
         self.pages[pageName].elements = nil
         self.pages[pageName] = nil
         
@@ -43,17 +45,74 @@ function g:removePage(pageName)
     end
 end
 
--- About Text
+-- Add Text
 function g:addText(pageName, data)
+
     if not pageName or not data then
         return error("GUI Error: No name nor data passed as arguments.", 2)
-    elseif self:pageExists(pageName) then
-        self.pages[pageName]:addText(data.name, data)
+    elseif self:pageExists(pageName) then        
+        self.pages[pageName]:add("text", data)
     else
         error("GUI Error: Page " .. pageName .. " doesn\'t exists", 2)
     end
 end
 
+
+-- About Image
+function g:addImage(pageName, data) 
+    if not pageName or not data then
+        return error("GUI Error: Page name or data not passed as arguments for new image.", 2)
+    elseif self:pageExists(pageName) then
+        self.pages[pageName]:add("image", data)    
+    end        
+end
+
+-- About Button
+function g:addButton(pageName, data)
+    if not pageName or not data then
+        return error("GUI Error: Page name or data not passed as arguments for new button.", 2)
+    elseif self:pageExists() then
+        self.pages[pageName]:add("button", data)
+    end
+end
+
+
+-- Remove elements
+function g:remove(pageName, name)
+    if not pageName or not name then
+        return error("GUI Error: Page name or name not passed.", 2)
+    elseif not g:pageExists(pageName) then       
+        return error("GUI Error: Page " .. pageName .. "doesn't exists.")
+    else        
+        self.pages[pageName]:remove(name)
+    end
+
+end
+
+
+-- Modify element from page
+function g:modify(pageName, elementName, data)
+
+    if not pageName or not elementName or not data then
+        return error("GUI Error: Missing 'Page name, element name or data' isn't passed.", 2)
+    elseif self:pageExists(pageName) then
+        self.pages[pageName]:modify(elementName, data)
+    end
+end
+
+
+-- Delete a whole page
+function g:delete(pageName) 
+    if g:pageExists(pageName) then
+        self.pages[pageName].elements = nil
+        self.pages[pageName] = nil
+        for i, n in pairs(self.activePages) do
+            if n == pageName then
+                table.remove(self.activePages, i)
+            end
+        end
+    end
+end
 
 -- Visualize
 function g:show()
@@ -61,6 +120,7 @@ function g:show()
         self.pages[n]:draw()     
     end
 end
+
 
 
 -- Utilities

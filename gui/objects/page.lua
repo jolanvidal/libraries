@@ -1,4 +1,6 @@
 local Text = require('gui.objects.text')
+local Image = require('gui.objects.image')
+local Button = require("gui.objects.button")
 
 
 local p = {}
@@ -29,31 +31,57 @@ function p:new(data)
         x = data.x or p.default.x,
         y = data.y or p.default.y,
         w = data.w or p.default.w,
-        h = data.h or p.default.h,
-        centerX = p.default.centerX,
-        centerY = p.default.centerY,
+        h = data.h or p.default.h        
     }
+    page.centerX = (page.x + page.w) / 2
+    page.centerY = (page.y + page.h) / 2
+
     return setmetatable(page, p)
 end
-
-function p:addText(data, replace)
-    if not data or #data == 0 then return error('GUI Error: No data passed for new element', 2)       
-    elseif data.name == nil then return error('GUI Error: No name passed for new element', 2)        
+function p:add(type, data)
+    local data = data or {}
+    if not type then return error("No type given for new object.")
+    elseif not data then return error("No data given for new object.")
+    elseif self:elementExists(data.name) then return error("Object named ".. data.name .. "already exists in this page.")
     end
 
-    if not self:elementExists(data.name) or replace then
-        local element = Text:new(data)
-        self.elements[data.name] = element
-        table.insert(self.activeElements, element.name)
-    else
-        return error("GUI Error: Element '"..element.name.."' already exists.")
+    local obj
+    
+    if type == "text" then
+        obj = Text:new(data)    
+    elseif type == "image" then
+        obj = Image:new(data)       
+    elseif type == "button" then
+        obj = Button:new(data)
+    end
+    self.elements[data.name] = obj
+    table.insert(self.activeElements, data.name)
+end
+
+function p:remove(name)
+    if self:elementExists(name) then
+        self.elements[name] = nil
+
+        for i, e in pairs(self.activeElements) do
+            if e == name then
+                table.remove(self.activeElements, i)
+                break
+            end
+        end
+    end
+end
+
+function p:modify(elementName, data)
+    if self:elementExists(elementName) then
+        self.elements[elementName]:modify(data)
     end
 end
 
 
 function p:draw() 
-    for _, obj in pairs(self.activeElements) do
-        self.elements[obj.name]:draw()
+    
+    for _, obj in pairs(self.activeElements) do       
+        self.elements[obj]:draw(self)
     end 
 end
 
