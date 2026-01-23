@@ -46,9 +46,9 @@ function love.load()
         text = "btn",
         font = fonts.buttons,
         action = function() error("CLICK", 2) end,
-        borderColor = {0,0,1},
+        borderColor = {1,0,1},
         bgColor = {1,1,1},
-        fgColor = {0,0,0},
+        fgColor = {0.577,0.123,0.123},
         hfgColor = nil,
         hbgColor = nil
     })
@@ -67,10 +67,4 @@ end
 
 function love.draw()
     gui:show()
-
- 
 end
-
-
-
-

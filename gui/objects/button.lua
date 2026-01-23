@@ -40,8 +40,10 @@ function b:new(data)
 end
 
 function b:draw()
-
-    local middleX, middleY = (self.x+self.w)/2, (self.y+self.h)/2
+   
+    local middleX = (self.x+self.w)/2
+    local middleY = (self.y+self.h)/2
+ 
     
     -- Rectangle
     love.graphics.setColor(self.bgColor)    
@@ -52,8 +54,11 @@ function b:draw()
     love.graphics.rectangle("line", self.x, self.y, self.w, self.h)
 
     --Text
+    love.graphics.setFont(self.font)
+
+    local font = love.graphics.getFont()
     love.graphics.setColor(self.fgColor)
-    love.graphics.print(self.text, middleX - self.font:getWidth(self.text) / 2, middleY - self.font:getHeight(self.text)/2)
+    love.graphics.print(self.text, middleX - font:getWidth(self.text) / 2, middleY - font:getHeight(self.text)/2)
 
     love.graphics.setColor(1,1,1)
 end
