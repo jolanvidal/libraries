@@ -1,8 +1,5 @@
 local Page = require("gui.objects.page")
 
-
-
-
 local g = {
     pages = {},
     activePages = {},
@@ -12,6 +9,8 @@ function g:init()
     self.activePages = {}
     
 end
+
+ -- [[ Code for User ]]
 
 -- About Page
 function g:newPage(data, replace)
@@ -99,19 +98,6 @@ function g:modify(pageName, elementName, data)
 end
 
 
--- Delete a whole page
-function g:delete(pageName) 
-    if g:pageExists(pageName) then
-        self.pages[pageName].elements = nil
-        self.pages[pageName] = nil
-        for i, n in pairs(self.activePages) do
-            if n == pageName then
-                table.remove(self.activePages, i)
-            end
-        end
-    end
-end
-
 -- Visualize
 function g:show()
     for _, n in ipairs(self.activePages) do
@@ -127,6 +113,18 @@ function g:pageExists(pageName)
         return false
     end
     return true
+end
+function g:click(x,y)
+    for _, n in ipairs(self.activePages) do
+        self.pages[n]:click(x,y)
+    end   
+end
+
+
+function g:update(x,y)
+     for _, n in ipairs(self.activePages) do
+        self.pages[n]:update(x,y)
+    end   
 end
 
 

@@ -5,6 +5,7 @@ i.__index = i
 function i:new(data)
     local data = data or {}
     local img = {
+        type = data.type or error('No type given for new image.'),
         img = data.img,
         name = data.name,
         x = data.x,

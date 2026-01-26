@@ -16,6 +16,7 @@ t.default = {
 
 function t:new(data)
     local txt = {
+        type = data.type or error('No type given for new text.'),
         name = data.name or t.default.name,
         font = data.font or t.default.font ,
         x = data.x or t.default.x,

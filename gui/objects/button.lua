@@ -19,6 +19,7 @@ b.default = {
 function b:new(data) 
 
     local button = {
+        type = data.type or error('No type given for new button.'),
         name = data.name or "Name",
         text = data.text or "Button",
         x = data.x or 0,

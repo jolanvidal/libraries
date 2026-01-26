@@ -25,6 +25,7 @@ function p:new(data)
     local data = data or {}
 
     local page = {
+        type = data.type or error('No type given for new page.'),
         name = data.name,
         elements = {},
         activeElements = {},
@@ -88,6 +89,23 @@ end
 
 function p:elementExists(name)
     if self.elements[name] then return true end return false
+end
+
+function p:click(x,y)
+    for k, v in pairs(self.elements) do
+        if v.type and v.type == 'button' then
+            self.elements[k].action()
+        end
+    end 
+end
+
+
+function p:update(x,y)
+    for k, v in pairs(self.elements) do
+        if v.type and v.type == 'button' then
+            self.elements[k]:update()
+        end
+    end 
 end
 
 function p:print()

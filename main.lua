@@ -12,10 +12,11 @@ local fonts = {
 
 function love.load()  
     i = 0
-    gui:newPage({name = 'main'})
+    gui:newPage({name = 'main', type = 'page'})
 
 
     gui:addImage("main", {
+        type = "img",
         img = love.graphics.newImage("gui/img/noix.png"),
         x = 100,
         y = 100,
@@ -34,10 +35,11 @@ function love.load()
         --isCentered = false,
         isCenterX = true,
         --isCenterY = false
-        color = {1,0,0}
+        color = {1,0,0},
+        type = 'text'
     })   
     
-    gui:addButton("main", {
+        gui:addButton("main", {
         x = 0,
         y = 0,
         w = 100,
@@ -50,11 +52,9 @@ function love.load()
         bgColor = {1,1,1},
         fgColor = {0.577,0.123,0.123},
         hfgColor = nil,
-        hbgColor = nil
+        hbgColor = nil,
+        type = 'button'
     })
-
-    
-    
 
     --gui:modify("main", "background", {x = 0, y = 0, targetX = 800, targetY = 600})
 
@@ -62,9 +62,14 @@ function love.load()
 end
 
 function love.update(dt)   
-
+    local x, y = love.mouse.getPosition()
+    gui:update(x,y)
 end
 
 function love.draw()
     gui:show()
+end
+
+function love.mousepressed(x,y)
+    gui:click(x,y)
 end
