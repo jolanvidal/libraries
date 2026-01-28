@@ -47,7 +47,7 @@ function love.load()
         name = "mainButton",
         text = "btn",
         font = fonts.buttons,
-        action = function() error("CLICK", 2) end,
+        action = function() gui:modify("main", "background", {x = 0, y = 0, targetX = 800, targetY = 600}) end,
         borderColor = {1,0,1},
         bgColor = {1,1,1},
         fgColor = {0.577,0.123,0.123},
@@ -56,7 +56,7 @@ function love.load()
         type = 'button'
     })
 
-    --gui:modify("main", "background", {x = 0, y = 0, targetX = 800, targetY = 600})
+    
 
 
 end

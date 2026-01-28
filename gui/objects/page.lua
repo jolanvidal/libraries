@@ -92,9 +92,10 @@ function p:elementExists(name)
 end
 
 function p:click(x,y)
+
     for k, v in pairs(self.elements) do
-        if v.type and v.type == 'button' then
-            self.elements[k].action()
+        if v.type and v.type == 'button' then   
+            self.elements[k]:click(x,y)
         end
     end 
 end
@@ -103,7 +104,7 @@ end
 function p:update(x,y)
     for k, v in pairs(self.elements) do
         if v.type and v.type == 'button' then
-            self.elements[k]:update()
+            self.elements[k]:update(x, y)
         end
     end 
 end

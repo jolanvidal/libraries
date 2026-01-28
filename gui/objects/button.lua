@@ -40,28 +40,64 @@ function b:new(data)
     return setmetatable(button, b)
 end
 
+function b:click(x,y)   
+    if self.isHover then
+        self:action()
+    end
+end
+function b:update(x,y)
+    if self:isHovered(x,y) then
+        self.isHover = true
+    else
+        self.isHover = false    
+    end
+end
+
 function b:draw()
    
     local middleX = (self.x+self.w)/2
     local middleY = (self.y+self.h)/2
- 
-    
-    -- Rectangle
-    love.graphics.setColor(self.bgColor)    
-    love.graphics.rectangle("fill", self.x, self.y, self.w, self.h)
-
-    --Border
-    love.graphics.setColor(self.borderColor)
-    love.graphics.rectangle("line", self.x, self.y, self.w, self.h)
-
     --Text
     love.graphics.setFont(self.font)
-
     local font = love.graphics.getFont()
-    love.graphics.setColor(self.fgColor)
-    love.graphics.print(self.text, middleX - font:getWidth(self.text) / 2, middleY - font:getHeight(self.text)/2)
+ 
+    if self.isHover then
+        love.graphics.setColor(self.hbgColor)
+        love.graphics.rectangle("fill", self.x, self.y, self.w, self.h)
+        --Border
+        love.graphics.setColor(self.borderColor)
+        love.graphics.rectangle("line", self.x, self.y, self.w, self.h)
+
+        love.graphics.setColor(self.hfgColor)
+        love.graphics.print(self.text, middleX - font:getWidth(self.text) / 2, middleY - font:getHeight(self.text)/2)
+
+    else 
+        -- Rectangle
+        love.graphics.setColor(self.bgColor)    
+        love.graphics.rectangle("fill", self.x, self.y, self.w, self.h)
+
+        --Border
+        love.graphics.setColor(self.borderColor)
+        love.graphics.rectangle("line", self.x, self.y, self.w, self.h)
+
+        love.graphics.setColor(self.fgColor)
+        love.graphics.print(self.text, middleX - font:getWidth(self.text) / 2, middleY - font:getHeight(self.text)/2)
+
+ 
+
+
+    
+    end   
+    
 
     love.graphics.setColor(1,1,1)
+end
+
+-- Utilities
+
+function b:isHovered(x,y)
+    return x > self.x and x < self.x + self.w
+        and y > self.y and y < self.y + self.h
 end
 
 
