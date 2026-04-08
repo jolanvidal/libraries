@@ -1,70 +1,39 @@
-# \###################
+
 
 # Migration Client:
 
-###### 
+<?php
+use Illuminate\\Database\\Migrations\\Migration;
+use Illuminate\\Database\\Schema\\Blueprint;
+use Illuminate\\Support\\Facades\\Schema;
 
-###### 
 
-### <?php
+return new class extends Migration
+{
 
-### 
 
-### use Illuminate\\Database\\Migrations\\Migration;
 
-### use Illuminate\\Database\\Schema\\Blueprint;
+    public function up(): void
+    {
 
-### use Illuminate\\Support\\Facades\\Schema;
+        Schema::create('clients', function (Blueprint $table) {
 
-### 
+        $table->id();
+        $table->string("nom");
+        $table->string("email")->unique();
+        $table->string("password");
+        $table->rememberToken();
+        $table->timestamps();
+        });
+    }
 
-### return new class extends Migration
 
-### {
+    public function down(): void
+    {
 
-### &#x20;   /\*\*
+    Schema::dropIfExists('clients');
 
-### &#x20;    \* Run the migrations.
-
-### &#x20;    \*/
-
-### &#x20;   public function up(): void
-
-### &#x20;   {
-
-### &#x20;       Schema::create('clients', function (Blueprint $table) {
-
-### &#x20;           $table->id();
-
-### &#x20;           $table->string("nom");
-
-### &#x20;           $table->string("email")->unique();
-
-### &#x20;           $table->string("password");
-
-### &#x20;           $table->rememberToken();
-
-### &#x20;           $table->timestamps();
-
-### &#x20;       });
-
-### &#x20;   }
-
-### 
-
-### &#x20;   /\*\*
-
-### &#x20;    \* Reverse the migrations.
-
-### &#x20;    \*/
-
-### &#x20;   public function down(): void
-
-### &#x20;   {
-
-### &#x20;       Schema::dropIfExists('clients');
-
-### &#x20;   }
+    }
 
 };
 
@@ -73,346 +42,231 @@
 App/Models/Client.php :
 
 <?php
-===
 
-### 
+namespace App\Models;
 
-### namespace App\\Models;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-### 
+class Client extends Authenticatable {
 
-### use Illuminate\\Foundation\\Auth\\User as Authenticatable;
+    protected $fillable = ["nom", "email", "password"];
+    protected $hidden = ["password", "remember_token"];
 
-### 
+}
 
-### class Client extends Authenticatable
 
-### {
 
-### &#x20;   protected $fillable = \["nom", "email", "password"];
-
-### 
-
-### &#x20;   protected $hidden = \["password", "remember\_token"];
-
-### }
-
-# 
-
-\#################
+#################
 config/auth.php : 
 
 
-'guards' => \[
-===
+'guards' => [
+    'web' => [
+        'driver' => 'session',
+        'provider' => 'users',
+    ],
+    'client' => [
+        'driver' => 'session',
+        'provider' => 'clients'
+    ]
 
-# &#x20;       'web' => \[
+],
 
-# &#x20;           'driver' => 'session',
 
-# &#x20;           'provider' => 'users',
 
-# &#x20;       ],
+'providers' => [
+    'users' => [
+        'driver' => 'eloquent',
+        'model' => env('AUTH_MODEL', App\Models\User::class),
 
-# &#x20;       'client' => \[
+    ],
+    'clients' => [
+        'driver' => 'eloquent',
+        'model' => App\Models\Client::class
+    ],
 
-# &#x20;           'driver' => 'session',
+    ???
 
-# &#x20;           'provider' => 'clients'
+    'users' => [
+        'driver' => 'database',
+        'table' => 'users',
+    ],
 
-# &#x20;       ]
-
-&#x20;   ],
-
-===
-
-# 
-
-# 
-
-# 'providers' => \[
-
-# &#x20;       'users' => \[
-
-# &#x20;           'driver' => 'eloquent',
-
-# &#x20;           'model' => env('AUTH\_MODEL', App\\Models\\User::class),
-
-# &#x20;       ],
-
-# &#x20;       'clients' => \[
-
-# &#x20;           'driver' => 'eloquent',
-
-# &#x20;           'model' => App\\Models\\Client::class
-
-# &#x20;       ]
-
-# 
-
-# &#x20;       // 'users' => \[
-
-# &#x20;       //     'driver' => 'database',
-
-# &#x20;       //     'table' => 'users',
-
-# &#x20;       // ],
-
-&#x20;   ]
+]
 
 
 
 ###################
  Ajouter les Vues :
-===
 
-# 
 
 value = {{ old('nom') }} pour les inputs gardent anciennes valeurs
 
  Ajout d'un bouton inscription dans le nav:  <a class="btn btn-outline-accent position-relative" href="{{ route('auth.registerForm')}}">Register</a> / similaire
 
-/views/auth : register.blade.php / Ajouter name='' (nom, email, password, name pour conf = password\\\\\\\_confimation) a chaque input, changer action="{{route}}... / 
-
-===
-
-
+/views/auth : register.blade.php / Ajouter name='' (nom, email, password, name pour conf = password_confimation) a chaque input, changer action="{{route}}... / 
 
 ## Dans vue: @auth("client") pour verifier si connecter et @guest("client") pour l'inverse / ("client") a cause du Guard (faux User / Est vrai Client)
 
-# 
 
-# 
 
-# 
-
-# 
-
-\####################
+####################
 Controller: AuthController 
-===
-
 
 <?php
-===
 
-# 
+namespace App\Http\Controllers;
 
-# namespace App\\Http\\Controllers;
+use App\Models\Client;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
-# 
+class AuthController extends Controller {
 
-# use App\\Models\\Client;
 
-# use Illuminate\\Http\\Request;
 
-# use Illuminate\\Support\\Facades\\Auth;
+    public function registerForm() {
+        return view('auth.register');
+    }
 
-# use Illuminate\\Support\\Facades\\Hash;
 
-# 
+    public function loginForm() {
+        return view("auth.login");
+    }
 
-# class AuthController extends Controller
+    public function register(Request $request) {
 
-# {
+        // Valider form
 
-# 
+        $donnees = $request->validate([
+            "nom" => "required|string|max:255",
+            "email" => "required|email|max:255|unique:clients",
+            "password" => "required|min:8|confirmed"
+            ],[
+                "nom.required" => "Le champ est requis",
+                "nom.string" => "Le nom doit être écrit de façon alphanumérique"
+            ]);
 
-# &#x20;   /\*\*
+        // Crée objet client / persist() BDD
+        $client = new Client();
+        $client->nom = $donnees["nom"];
+        $client->email = $donnees["email"];
+        $client->password = Hash::make($donnees["password"]);
+        $client->save();
 
-# &#x20;    \* Affiche le formulaire d'inscription
+        // le logger
 
-# &#x20;    \*
+        Auth::guard("client")->login($client);
+        // Redirige accueil
 
-# &#x20;    \* @return View
+        return redirect()->route("accueil")->with("succes", "Vous êtes désormais connecté");
+    }
 
-# &#x20;    \*/
 
-# &#x20;   public function registerForm() {
 
-# &#x20;       return view('auth.register');
+    public function login(Request $request) {
 
-# &#x20;   }
+        $donnees = $request->validate([
+        "email" => "required|email|max:255",
+        "password" => "required"
+         ]);
 
-# 
+        // Essayer de connecter
 
-# 
+        if (Auth::guard("client")->attempt($donnees)) {
+            $request->session()->regenerate();
+            return redirect()->intended(route("accueil"));
+        }
+        return back()->withErrors(["email" => "Le courriel ou le mot de passe est invalide"]);
 
-# &#x20;   /\*\*
+                            ?? PAS @error() mais if(session(`email`));
+    }
 
-# &#x20;    \* Affiche le formulaire de connexion
 
-# &#x20;    \*
+    public function logout(Request $request) {
+        Auth::guard("client")->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
-# &#x20;    \* @return View
+        return redirect()->route("accueil")->with("succes", "Vous êtes déconnecter");
+    }
 
-# &#x20;    \*/
+}
 
-# &#x20;   public function loginForm() {
 
-# &#x20;       return view("auth.login");
-
-# &#x20;   }
-
-# 
-
-# &#x20;   /\*\*
-
-# &#x20;    \* Traite le formulaire d'inscription
-
-# &#x20;    \*
-
-# &#x20;    \* @param Request $request
-
-# &#x20;    \* @return Redirect
-
-# &#x20;    \*/
-
-# &#x20;   public function register(Request $request) {
-
-# &#x20;       // Valider form
-
-# &#x20;       $donnees = $request->validate(\[
-
-# &#x20;           "nom" => "required|string|max:255",
-
-# &#x20;           "email" => "required|email|max:255|unique:clients",
-
-# &#x20;           "password" => "required|min:8|confirmed"
-
-# 
-
-# &#x20;       ],\[
-
-# &#x20;           "nom.required" => "Le champ est requis",
-
-# &#x20;           "nom.string" => "Le nom doit être écrit de façon alphanumérique"
-
-# &#x20;       ]);
-
-# &#x20;       // Crée objet client / persist() BDD
-
-# 
-
-# &#x20;       $client = new Client();
-
-# 
-
-# &#x20;       $client->nom = $donnees\["nom"];
-
-# &#x20;       $client->email = $donnees\["email"];
-
-# &#x20;       $client->password = Hash::make($donnees\["password"]);
-
-# 
-
-# &#x20;       $client->save();
-
-# &#x20;       // le logger
-
-# &#x20;       Auth::guard("client")->login($client);
-
-# 
-
-# &#x20;       // Redirige accueil
-
-# &#x20;       return redirect()->route("accueil")->with("succes", "Vous êtes désormais connecté");
-
-# &#x20;   }
-
-# 
-
-# &#x20;   /\*\*
-
-# &#x20;    \* Traite le formulaire de connexion
-
-# &#x20;    \*
-
-# &#x20;    \* @param Request $request
-
-# &#x20;    \* @return Redirect
-
-# &#x20;    \*/
-
-# &#x20;   public function login(Request $request) {
-
-# &#x20;       $donnees = $request->validate(\[
-
-# &#x20;           "email" => "required|email|max:255",
-
-# &#x20;           "password" => "required"
-
-# &#x20;       ]);
-
-# 
-
-# &#x20;       // Essayer de connecter
-
-# &#x20;       if (Auth::guard("client")->attempt($donnees)) {
-
-# &#x20;          $request->session()->regenerate();
-
-# &#x20;          return redirect()->intended(route("accueil"));
-
-# &#x20;       }
-
-# 
-
-# &#x20;       return back()->withErrors(\["email" => "Le courriel ou le mot de passe est invalide"]);
-
-# 
-
-# &#x20;   }
-
-# }
-
-
-
-
-
-### ////////////////////////////////////////////////
-
-
-
-
-
-
-
-
-
-
-
-###### 
-
-\#####################
+#####################
 Web.php :
 
 
-===
-
-# Route::get("/register", \[AuthController::class, "registerForm"])->name("auth.registerForm");
-
-# 
-
-Route::post("/register", \[AuthController::class, "register"])->name("auth.register");
-
-===
-
-# 
-
-# Route::get("/login", \[AuthController::class, "loginForm"])->name("auth.loginForm");
-
-# 
-
-# Rouge::post("/login", \[AuthController::class, "login"])->name("auth.login");
-
-# 
+Route::get("/register", [AuthController::class, "registerForm"])
+    ->middleware("guest:client")
+    ->name("auth.registerForm");
 
 
+
+Route::post("/register", [AuthController::class, "register"])->name("auth.register");
+
+ 
+ ?? NOM LOGIN NECESSAIRE 
+Route::get("/login", [AuthController::class, "loginForm"])->name("auth.loginForm");
+
+
+Route::post("/login", [AuthController::class, "login"])
+    ->middleware("throttle:5, 1")
+->name("auth.login");
+
+
+Route::post("/logout", [AuthController::class, "logout"])->name("auth.logout)
 
 
 
 
 
-===
+###
 
+logout doit être dans un mini form avec un bouton.
+
+dans @auth("client") -> {{ Auth::guard("client")->user()->nom }}
+
+// Proteger UNE route (middlewares)
+    ex: Route::post("/logout", [AuthController::class, "logout"])
+        ->middleware("auth:client")
+        ->name("auth.logout);
+
+// PLUSIEURS ROUTES
+    Route::middleware("guest:client")->group(function() {
+
+        LES ROUTES SONT ICI.
+
+    });
+
+
+                                                                            // Nom
+// Form Request au lieu de $request->validate() // php artisan make:request LoginRequest
+  
+
+    fonction login(LoginRequest $request) {
+        $donnees = $request->validateD();
+    }
+
+    function register(RegisterRequest $request) {
+        $donnees = $request->validateD();
+    }
+
+
+    // Crée authorize, rules, (messages si on veut)
+
+    // rules: array 
+    [
+        "email" => "required|email|max:255",
+        "password" => "required", etc.
+    ]
+
+    public function messages() {
+        return [
+            "email.required" => "Courriel obligatoire"
+            "email.email" => "Courriel doit être un courriel"
+            "email.max" => "Nombre maximum de caractère :max 
+        ]
+    }
